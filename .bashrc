@@ -9,11 +9,10 @@ case $- in
 esac
 
 HISTCONTROL=ignoreboth
-shopt -s histappend
-
 HISTSIZE=1000
 HISTFILESIZE=2000
 
+shopt -s histappend
 shopt -s checkwinsize
 
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]
@@ -28,11 +27,11 @@ function current_git_branch() {
   then
     echo -n ""
   else
-    echo -ne " [\e[32m$BRANCH\e[00m]"
+    echo -ne " ├\e[32m$BRANCH\e[00m┤"
   fi
 }
 
-PS1="\A \[\033[00m\]\u@\[\033[31m\]\h\[\033[00m\]:\[\033[1;34m\]\w\[\033[00m\]\$(current_git_branch)\$ "
+PS1="\A│\[\033[00m\]\u@\[\033[31m\]\h\[\033[00m\]:\[\033[1;34m\]\w\[\033[00m\]\$(current_git_branch)\$ "
 PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
 
 if [ -x /usr/bin/dircolors ]
