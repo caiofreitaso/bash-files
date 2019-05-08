@@ -17,4 +17,10 @@ alias nuke-docker="docker ps -aq | xargs -n1 docker rm -f"
 complete -F _pg_container pg_container
 
 #QOL related
+function commitpush() {
+  local message="$1"
+  git commit -m "$message"
+  git push origin "$(git branch 2> /dev/null | awk '{ if ($0 ~ /\*/) { print $2 } }')"
+}
+
 alias fix-display="DISPLAY=:0.0 xrandr --output DP-0 --rotate left"

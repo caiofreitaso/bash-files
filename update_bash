@@ -1,5 +1,19 @@
 #!/bin/bash
 
-cp .bashrc ~
-cp .bash_aliases ~
-source ~/.bashrc
+function unlink_or_rm() {
+  local target=$1
+  unlink $target
+  if [ $? != 0 ]
+  then
+    rm $target
+  fi
+}
+
+function update_file() {
+  local file=$1
+  unlink_or_rm ~/$file
+  ln -s $(pwd)/$file ~/$file
+}
+
+update_file .bashrc
+update_file .bash_aliases
