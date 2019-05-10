@@ -27,12 +27,12 @@ function current_git_branch() {
   then
     echo -n ""
   else
-    echo -ne "├\e[32m$BRANCH\e[00m┤"
+    echo -ne "├\001\e[32m\002$BRANCH\001\e[00m\002┤" # \001 == \[, \002 == \]
   fi
 }
 
 PS1="\A│\[\033[00m\]\u@\[\033[31m\]\h\[\033[00m\]│\[\033[1;34m\]\w\[\033[00m\]\$(current_git_branch)\$ "
-PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h|\w\a\]$PS1"
 
 . ~/.bash_aliases
 
