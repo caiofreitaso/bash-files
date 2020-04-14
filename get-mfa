@@ -1,0 +1,31 @@
+#!/bin/bash
+
+GPG_EMAIL="$1"
+ACCOUNT="$2"
+
+KEY_LOCATION=~/.2fa/$ACCOUNT/.key.gpg
+
+if [ "${GPG_EMAIL}" == "" ]
+then
+  echo "Usage: $0 email service"
+  exit 1
+fi
+
+if [ ! -f "${KEY_LOCATION}" ]
+then
+  echo "Error: Encrypted file \"${KEY_LOCATION}\" not found."
+  exit 2
+fi
+
+GPG_PUB_KEY=$(gpg2 --list-secret-keys --keyid-format LONG | grep -B 1 ${GPG_EMAIL} | head -n1 | awk '{print $1}')
+GPG_SEC_KEY=$(gpg2 --list-secret-keys --keyid-format LONG | grep -B 2 ${GPG_EMAIL} | head -n1 | awk '{print $2}' | awk -F/ '{print $2}')
+TOTP=$(gpg2 --quiet -u "${GPG_SEC_KEY}" -r "${GPG_PUB_KEY}" --decrypt "${KEY_LOCATION}")
+MFA_CODE=$(oathtool -b --totp "${TOTP}")
+
+echo "MFA Code for ${ACCOUNT}: ${MFA_CODE}"
+type -a xclip &> /dev/null
+if [ $? -eq 0 ]
+then
+  echo $MFA_CODE | xclip -sel clip
+  echo "* Code in clipboard *"
+fi

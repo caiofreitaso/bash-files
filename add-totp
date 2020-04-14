@@ -1,0 +1,29 @@
+#!/bin/bash
+set -ev
+
+GPG_EMAIL="$1"
+ACCOUNT="$2"
+PRIVATE_KEY="$3"
+
+ACCOUNT_DIR=~/.2fa/$ACCOUNT
+KEY_LOCATION=$ACCOUNT_DIR/.key
+
+if [ "$ACCOUNT" == "" ]
+then
+  echo "Usage: $0 email service key"
+  exit 1
+fi
+
+if [ -f "${KEY_LOCATION}.gpg" ]
+then
+  echo "$0 - Error: Encrypted file \"${KEY_LOCATION}.gpg\" exists"
+  exit 2
+fi
+
+mkdir -p $ACCOUNT_DIR
+echo -n ${PRIVATE_KEY} > $KEY_LOCATION
+
+GPG_PUB_KEY=$(gpg2 --list-secret-keys --keyid-format LONG | grep -B 1 ${GPG_EMAIL} | head -n1 | awk '{print $1}')
+GPG_SEC_KEY=$(gpg2 --list-secret-keys --keyid-format LONG | grep -B 2 ${GPG_EMAIL} | head -n1 | awk '{print $2}' | awk -F/ '{print $2}')
+
+gpg2 -u "${GPG_SEC_KEY}" -r "${GPG_PUB_KEY}" --encrypt "${KEY_LOCATION}" && rm -i "${KEY_LOCATION}"
