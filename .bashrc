@@ -20,18 +20,24 @@ then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
+
 function current_git_branch() {
   BRANCH="$(git branch 2> /dev/null | awk '{ if ($0 ~ /\*/) { print $2 } }')"
 
   if [ -z "$BRANCH" ]
   then
-    echo -n ""
+    printf ''
   else
-    echo -ne "├\001\e[32m\002$BRANCH\001\e[00m\002┤" # \001 == \[, \002 == \]
+    printf "├$BRANCH┤" # \001 == \[, \002 == \]
   fi
 }
 
-PS1="\A│\[\033[00m\]\u@\[\033[31m\]\h\[\033[00m\]│\[\033[1;34m\]\w\[\033[00m\]\$(current_git_branch)\$ "
+RESET=$(tput sgr0)
+BOLD=$(tput bold)
+BLUE=$(tput setaf 4)
+GREEN=$(tput setaf 2)
+RED=$(tput setaf 1)
+PS1="\A│\u@\[$RED\]\h\[$RESET\]│\[$BLUE$BOLD\]\w\[$RESET\]\[$GREEN\]\$(current_git_branch)\[$RESET\]\$ "
 PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h|\w\a\]$PS1"
 
 . ~/.bash_aliases

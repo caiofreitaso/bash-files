@@ -13,7 +13,7 @@ function pg_container() {
   docker run -it --link ${container_name}:currentpg postgres:9 psql postgres://${user}:${password}@currentpg/${database}
 }
 
-alias nuke-docker="docker ps -aq | xargs -n1 docker rm -f"
+alias nuke-docker="docker ps -aq | xargs -r docker rm -f && docker volume prune -f"
 complete -F _pg_container pg_container
 
 #QOL related
@@ -24,3 +24,4 @@ function commitpush() {
 }
 
 alias fix-display="DISPLAY=:0.0 xrandr --output DP-0 --rotate left"
+alias prune-branches="git fetch --prune; git branch -r | awk '{ print $1 }' | egrep -v -f /dev/fd/0 <(git branch | awk '{ print substr($0, 2) }') | xargs git branch -d"
