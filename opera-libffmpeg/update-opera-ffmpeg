@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Run using sudo
+if [[ $(whoami) != "root" ]]; then
+  echo 'Must run as root'
+  exit 1
+fi
+
+readonly OPERA_FOLDER='/usr/lib/x86_64-linux-gnu/opera/'
+readonly FILE_NAME='libffmpeg.so'
+readonly FFMPEG_URL='https://api.github.com/repos/Ld-Hagen/fix-opera-linux-ffmpeg-widevine/releases'
+
+echo 'Getting URL...'
+readonly OPERA_FFMPEG_URL=$(wget -qO - $FFMPEG_URL | grep browser_download_url | cut -d '"' -f 4 | grep linux-x64 | head -n 1)
+echo 'Downloading ffmpeg ZIP file'
+wget $OPERA_FFMPEG_URL -O "/tmp/${FILE_NAME}.zip"
+unzip "/tmp/${FILE_NAME}.zip" -d "/tmp/${FILE_NAME}"
+echo "Moving ffmppeg.so to ${OPERA_FOLDER}"
+mv -f "/tmp/${FILE_NAME}/${FILE_NAME}" "${OPERA_FOLDER}/${FILE_NAME}"
